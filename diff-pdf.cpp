@@ -189,6 +189,13 @@ cairo_surface_t *diff_images(cairo_surface_t *s1, cairo_surface_t *s2,
                 unsigned char cg2 = *(data2 + x + 1);
                 unsigned char cb2 = *(data2 + x + 2);
 
+                // lighten up base file
+                if ( ! ( *(out + x + 0) > 240 && *(out + x + 1) > 240 && *(out + x + 2) > 240 ) ) {
+                   *(out + x + 0) = 220;
+                   *(out + x + 1) = 220;
+                   *(out + x + 2) = 220;
+                }
+
                 if ( cr1 != cr2 || cg1 != cg2 || cb1 != cb2 )
                 {
                     changes = true;
@@ -207,14 +214,18 @@ cairo_surface_t *diff_images(cairo_surface_t *s1, cairo_surface_t *s2,
                         // mark changes with red
                         thumbnail->SetRGB(tx, ty, 255, 0, 0);
                     }
+
+                    // highlight diff
+                    *(out + x + 0) = 0;  // blue?
+                    *(out + x + 1) = 0;  // green?
+                    *(out + x + 2) = 255;  // red?
                 }
 
-                // change the B channel to be from s2; RG will be s1
-                *(out + x + 2) = cb2;
+                ////// change the B channel to be from s2; RG will be s1
+                ////*(out + x + 2) = cb2;
             }
         }
     }
-
     // add background image of the page to the thumbnails
     if ( thumbnail )
     {
@@ -877,7 +888,7 @@ int main(int argc, char *argv[])
     wxCmdLineParser parser(cmd_line_desc, argc, argv);
 
     // Set default output to stderr
-    wxMessageOutput::Set(new wxMessageOutputStderr); 
+    wxMessageOutput::Set(new wxMessageOutputStderr);
 
     switch ( parser.Parse() )
     {
